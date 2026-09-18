@@ -14,7 +14,7 @@
 
   function fmtDetail(d) {
     const m = d.motive ? '为了【' + esc(d.motive) + '】，' : '';
-    if (d.type === 'record') return m + '你记录了 ' + d.amount + (d.unit ? ' ' + esc(d.unit) : '');
+    if (d.type === 'record') return m + '你记录了 ' + d.amount;
     return m + '你完成了「' + esc(d.name) + '」';
   }
 
@@ -47,10 +47,10 @@
         if (q.type === 'record') {
           const total = XH.quests.todayTotal(q);
           if (total > 0) {
-            details.push({ name: q.name, motive: q.motive || '', amount: total, unit: q.unit || '', type: 'record' });
+            details.push({ name: q.name, motive: q.motive || '', amount: total, type: 'record' });
           }
         } else if (q.status === 'lit') {
-          details.push({ name: q.name, motive: q.motive || '', amount: 0, unit: '', type: 'checkin' });
+          details.push({ name: q.name, motive: q.motive || '', amount: 0, type: 'checkin' });
         }
       });
       return details;

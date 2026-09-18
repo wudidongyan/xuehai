@@ -33,7 +33,7 @@
   function presetQuests() {
     const mk = function (id, name, power) {
       return { id: id, name: name, power: power, status: 'mist', builtin: true,
-               type: 'checkin', motive: '', minAmount: 0, unit: '', records: [] };
+               type: 'checkin', motive: '', minAmount: 0, records: [] };
     };
     return [
       mk('q_preset_1', '晨光试炼', 20),
@@ -77,7 +77,7 @@
         createdAt: Date.now()
       },
       continents: [],    // 大陆列表：{ id, name, reason, status, nodes: [...], createdAt }
-      quests: presetQuests(),          // 委托列表：{ id, name, power, status, builtin, type, motive, minAmount, unit, records }
+      quests: presetQuests(),          // 委托列表：{ id, name, power, status, builtin, type, motive, minAmount, records }
       questLastReset: XH.util.localDateKey(new Date()), // 委托上次重置日期
       bounty: {                         // 每日赏金（委托 / 大陆征服 独立计数）
         quest: { date: XH.util.localDateKey(new Date()), gold: 0 },
@@ -114,7 +114,6 @@
         if (q.type !== 'record' && q.type !== 'checkin') q.type = 'checkin';
         if (typeof q.motive !== 'string') q.motive = '';
         if (q.minAmount == null) q.minAmount = 0;
-        if (typeof q.unit !== 'string') q.unit = '';
         if (!Array.isArray(q.records)) q.records = [];
       });
       // 大陆：补齐征服理由 / 决战之日 / 终极标记

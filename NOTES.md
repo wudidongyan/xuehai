@@ -58,7 +58,7 @@
 
 **迷雾地图**：大陆列表（名字/征服理由/总战力/进度/决战日倒计时/补绑/钦定，终极置顶金边徽记）；开辟大陆（名字+征服理由+决战日可选）；大陆内面包屑导航、区域/试炼节点、增设/删除；点亮叶子（动画+奖励+战力传导+区域肃清+大陆征服，终极触发"远征终章"）；每日征服赏金 X/50。
 
-**委托板**：打卡型（下限+单位，点击完成）/ 记录型（记录数量+备注，累计）双模式；分「每日打卡」「自由记录」两区带数量；执念字段 + 类型徽章（印章/羽毛笔）；每日委托赏金 X/30。
+**委托板**：打卡型（下限，点击完成）/ 记录型（记录数量+备注，累计）双模式；分「每日打卡」「自由记录」两区带数量；执念字段 + 类型徽章（印章/羽毛笔）；每日委托赏金 X/30。
 
 **勇者传记（大厅入口名"编年史"）**：今日战报（发愿对照目标、委托明细带执念）；冒险日志；编年史（按日倒序）。
 
@@ -142,7 +142,7 @@ localStorage key：`xuehai_save_v1`。顶层结构：
   version: 1,
   adventurer: { name, classId, oath, level, exp, gold, power, createdAt },
   continents: [{ id, name, reason, battleDay, ultimate, status, nodes, createdAt }],
-  quests:    [{ id, name, power, status, builtin, type, motive, minAmount, unit, records }],
+  quests:    [{ id, name, power, status, builtin, type, motive, minAmount, records }],
   questLastReset: 'YYYY-MM-DD',
   bounty:     { quest: {date, gold}, node: {date, gold} },
   meditation: { vows: [], reflections: [], lastPromptDate },
@@ -153,7 +153,7 @@ localStorage key：`xuehai_save_v1`。顶层结构：
 ```
 
 - `node`：`{ id, name, parentId(null=根), type('region'|'trial'), power(仅叶子), status('mist'|'lit') }`
-- `quest.type`：`'checkin'`(打卡型) / `'record'`(记录型)；打卡型有 `minAmount`(下限)+`unit`(单位)，记录型有 `records`(数量+备注)。
+- `quest.type`：`'checkin'`(打卡型) / `'record'`(记录型)；打卡型有 `minAmount`(下限)，记录型有 `records`(数量+备注)。
 - `log.source`：`'node'`(大陆点亮，计战力) / `'quest'`(委托) / `'vow'`(发愿) / `'reflect'`(反思)。
 - 旧存档缺失字段在 `storage.normalize()` 里自动补齐，不会报错。
 

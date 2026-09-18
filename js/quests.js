@@ -48,7 +48,6 @@
         type: data.type || 'checkin', // 'checkin' | 'record'
         motive: data.motive || '',
         minAmount: data.type === 'checkin' ? (Number(data.minAmount) || 0) : 0, // 打卡型：每日下限
-        unit: data.type === 'checkin' ? (data.unit || '') : '',                 // 打卡型：单位
         records: []
       };
       state.quests.push(q);
@@ -154,7 +153,7 @@
     }
 
     const minLine = (!isRecord && q.minAmount > 0)
-      ? '<div class="quest-min zh">目标 ≥ ' + fmtNum(q.minAmount) + (q.unit ? ' ' + esc(q.unit) : '') + '</div>'
+      ? '<div class="quest-min zh">目标 ≥ ' + fmtNum(q.minAmount) + '</div>'
       : '';
 
     const motive = q.motive
@@ -316,15 +315,13 @@
     const power = parseInt($('quest-power').value, 10);
     if (!power || power <= 0 || power > 9999) { $('quest-modal-error').textContent = '战力需为 1~9999 的整数'; if (XH.audio) XH.audio.play('error'); return; }
 
-    let minAmount = 0, unit = '';
+    let minAmount = 0;
     if (questType === 'checkin') {
       minAmount = parseFloat($('quest-min').value);
-      unit = $('quest-unit').value.trim();
       if (!(minAmount > 0)) { $('quest-modal-error').textContent = '请设定下限（每日最低目标，大于 0）'; if (XH.audio) XH.audio.play('error'); return; }
-      if (!unit) { $('quest-modal-error').textContent = '请填写单位名（如：次）'; if (XH.audio) XH.audio.play('error'); return; }
     }
 
-    XH.quests.createQuest(XH.state, { name: name, power: power, type: questType, motive: motive, minAmount: minAmount, unit: unit });
+    XH.quests.createQuest(XH.state, { name: name, power: power, type: questType, motive: motive, minAmount: minAmount });
     XH.storage.save(XH.state);
     $('quest-modal-overlay').classList.remove('open');
     render();
@@ -341,7 +338,6 @@
       $('quest-motive').value = '';
       $('quest-power').value = '';
       $('quest-min').value = '';
-      $('quest-unit').value = '';
       $('quest-modal-error').textContent = '';
       setQuestTypeUI('checkin');
       $('quest-modal-overlay').classList.add('open');

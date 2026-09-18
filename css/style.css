@@ -973,15 +973,30 @@ body:has(#screen-meditation.active) .page-bg-shade {
 .modal {
   width: 100%;
   max-width: 440px;
+  max-height: 90vh;
+  max-height: 90dvh; /* 弹窗不超出可视区，移动端排除工具栏遮挡 */
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  overflow-y: auto;          /* 内容超高时弹窗内部滚动 */
+  overscroll-behavior: contain; /* 防止滚动穿透背景 */
 }
 .modal-title { font-size: 18px; color: var(--gold); }
 .modal-sub { font-size: 13px; color: #9a9ab8; }
 .modal-label { font-size: 12px; color: var(--exp-blue); }
-.modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 6px; }
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 6px;
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  flex-shrink: 0;
+  background: var(--panel);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
 .type-toggle { display: flex; gap: 10px; }
 .type-btn.active {
   background: var(--exp-blue);
@@ -1447,4 +1462,8 @@ body:has(#screen-meditation.active) .page-bg-shade {
   .chronicle-entry { padding: 8px 10px; gap: 4px; }
   .med-vow, .med-reflect { padding: 10px 12px; gap: 8px; }
   .settle-log, .chronicle, .med-history, .meditation-history { gap: 8px; }
+
+  /* 弹窗：压缩外边距与字段间距，字号保持 ≥14px 防 iOS 聚焦放大 */
+  .modal-overlay { padding: 8px; }
+  .modal { padding: 12px; gap: 10px; }
 }

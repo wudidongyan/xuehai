@@ -76,6 +76,7 @@
 - 视口单位修正：`.screen` 由 `inset: 0` 改为 `top/left/right: 0` + `height: 100vh; height: 100dvh`（`dvh` 跟随动态视口，排除移动端浏览器地址栏/工具栏遮挡；老浏览器回退 `100vh`），并 `padding-bottom: calc(… + env(safe-area-inset-bottom))` 为底部按钮留出安全区。
 - `viewport` meta 加 `viewport-fit=cover`；`<head>` 内加 manifest 链接、`theme-color`、iOS 三件套（apple-mobile-web-app-capable / status-bar-style black-translucent / apple-mobile-web-app-title）+ `apple-touch-icon`（`img/icon-chronicle.png`）。
 - 无 service worker、无离线缓存（本任务范围外）。
+- 弹窗防溢出：`.modal` 加 `max-height: 90vh/90dvh` + `overflow-y: auto`（内容超高时内部滚动）+ `overscroll-behavior: contain`；`.modal-actions` 加 `position: sticky; bottom: 0` + `flex-shrink: 0` + `padding-bottom: env(safe-area-inset-bottom)`，使发布/取消按钮始终可见可点；横屏紧凑模式压缩弹窗外边距（8px）与字段间距（字号保持 ≥14px 防 iOS 聚焦放大）。
 
 ### 阿黛事件系统 · 18 触发点
 

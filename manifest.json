@@ -1,0 +1,17 @@
+{
+  "name": "学海大陆",
+  "short_name": "学海大陆",
+  "description": "像素风异世界冒险主题的目标管理应用",
+  "lang": "zh-CN",
+  "display": "standalone",
+  "start_url": "./index.html",
+  "scope": "./",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "icons": [
+    { "src": "img/icon-map.png", "sizes": "450x512", "type": "image/png", "purpose": "any" },
+    { "src": "img/icon-chronicle.png", "sizes": "612x535", "type": "image/png", "purpose": "any" },
+    { "src": "img/icon-garden.png", "sizes": "499x549", "type": "image/png", "purpose": "any" },
+    { "src": "img/icon-board.png", "sizes": "572x477", "type": "image/png", "purpose": "any" }
+  ]
+}

@@ -12,6 +12,7 @@
 
 ```
 ├── index.html            所有页面 + 弹窗 + 脚本引入
+├── manifest.json         PWA 清单（display: standalone，添加到主屏幕全屏）
 ├── NOTES.md              本说明文件
 ├── css/
 │   └── style.css         全部样式（调色板变量、像素组件、各页面、动画、响应式）
@@ -69,7 +70,12 @@
 
 **移动端横屏适配**（`css/style.css` 末尾）：判定用 `pointer: coarse`（主输入为触屏）+ `orientation`——桌面 `pointer: fine` 不命中，拖窄窗口零影响。
 - 竖屏遮罩：`(pointer: coarse) and (orientation: portrait)` 显示全屏旋转遮罩（CSS 画的手机旋转动画 + "请旋转手机，横屏开始冒险"）。
-- 横屏紧凑化：`(pointer: coarse) and (orientation: landscape) and (max-height: 430px)` 触发——状态栏单行矮条、大厅四入口一排缩小（scene 360→120px）、终极横幅变矮、阿黛头像 120→56px、各内页收紧标题/间距/内边距。viewport 已为 `width=device-width, initial-scale=1`。
+- 横屏紧凑化：`(pointer: coarse) and (orientation: landscape) and (max-height: 430px)` 触发——状态栏单行矮条、大厅四入口一排缩小（scene 360→120px）、终极横幅变矮、阿黛头像 120→56px、各内页收紧标题/间距/内边距。
+
+**移动端视口与 PWA**：
+- 视口单位修正：`.screen` 由 `inset: 0` 改为 `top/left/right: 0` + `height: 100vh; height: 100dvh`（`dvh` 跟随动态视口，排除移动端浏览器地址栏/工具栏遮挡；老浏览器回退 `100vh`），并 `padding-bottom: calc(… + env(safe-area-inset-bottom))` 为底部按钮留出安全区。
+- `viewport` meta 加 `viewport-fit=cover`；`<head>` 内加 manifest 链接、`theme-color`、iOS 三件套（apple-mobile-web-app-capable / status-bar-style black-translucent / apple-mobile-web-app-title）+ `apple-touch-icon`（`img/icon-chronicle.png`）。
+- 无 service worker、无离线缓存（本任务范围外）。
 
 ### 阿黛事件系统 · 18 触发点
 

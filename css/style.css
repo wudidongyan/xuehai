@@ -53,12 +53,17 @@ svg { image-rendering: pixelated; }
    ============================================================ */
 .screen {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100dvh; /* 动态视口：移动端排除地址栏/工具栏遮挡，老浏览器忽略 */
   display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 24px;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
   z-index: 2;
 }
@@ -1392,7 +1397,7 @@ body:has(#screen-meditation.active) .page-bg-shade {
 
 /* 手机横屏 + 矮屏（高 360~430px）：紧凑布局 */
 @media (pointer: coarse) and (orientation: landscape) and (max-height: 430px) {
-  .screen { padding: 6px; }
+  .screen { padding: 6px; padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
   .hall-screen { padding: 6px 10px; }
   .hall-wrap { gap: 6px; }
 

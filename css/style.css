@@ -1467,3 +1467,40 @@ body:has(#screen-meditation.active) .page-bg-shade {
   .modal-overlay { padding: 8px; }
   .modal { padding: 12px; gap: 10px; }
 }
+
+/* ============================================================
+   安装到主屏幕引导气泡（仅手机未安装 + 大厅时显示）
+   ============================================================ */
+.install-guide {
+  position: fixed;
+  left: 50%;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  width: min(92vw, 420px);
+  z-index: 8900;
+  display: none;
+}
+body:has(#screen-hall.active) .install-guide.open {
+  display: block;
+}
+.install-guide-bubble {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: guideIn 0.3s steps(4) both;
+}
+.install-guide-text {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.9;
+}
+.install-guide-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+@keyframes guideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

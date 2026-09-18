@@ -89,6 +89,7 @@
         lastPromptDate: '' // 大厅发愿提示上次展示日期
       },
       loginStreak: { count: 0, lastDate: '' },  // 连续上线天数（阿黛事件）
+      installGuideDismissed: false, // 安装到主屏幕引导：永久关闭标记
       chronicle: [],     // 编年史：{ date, nodesLit, questsDone, power, exp, gold, note, questDetails, savedAt }
       log: []            // 日志：{ type, source, power, exp, gold, at }
     };
@@ -138,6 +139,8 @@
       if (!state.loginStreak || typeof state.loginStreak.count !== 'number') {
         state.loginStreak = { count: 0, lastDate: '' };
       }
+      // 安装到主屏幕引导：永久关闭标记（旧存档补齐，缺省 false）
+      if (typeof state.installGuideDismissed !== 'boolean') state.installGuideDismissed = false;
       return state;
     },
 

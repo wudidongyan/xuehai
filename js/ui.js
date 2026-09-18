@@ -59,7 +59,10 @@
       target.style.willChange = 'transform, opacity';
       target.classList.add('active');
       setTimeout(function () { target.style.willChange = ''; }, 260);
-      if (id === 'screen-hall') preloadInnerBackgrounds();
+      if (id === 'screen-hall') {
+        preloadInnerBackgrounds();
+        if (XH.installGuide) XH.installGuide.onHallEnter();
+      }
     }, function () {
       screenSwitching = false;
     });

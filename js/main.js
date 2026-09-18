@@ -20,6 +20,7 @@
     XH.settleUI.bind();
     XH.meditationUI.bind();
     XH.qiankunUI.bind();
+    XH.installGuide.bind();
 
     // 跨天时重置每日委托
     if (XH.state) XH.quests.ensureDailyReset(XH.state);

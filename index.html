@@ -48,6 +48,17 @@
     <p class="rotate-text zh">请旋转手机，横屏开始冒险</p>
   </div>
 
+  <!-- 安装到主屏幕引导气泡（仅手机未安装 + 大厅时显示） -->
+  <div id="install-guide" class="install-guide" role="dialog" aria-label="安装到主屏幕">
+    <div class="install-guide-bubble pixel-panel">
+      <p class="install-guide-text zh" id="install-guide-text"></p>
+      <div class="install-guide-actions">
+        <button id="btn-guide-ok" class="pixel-btn pixel-btn-sm">知道了</button>
+        <button id="btn-guide-never" class="pixel-btn pixel-btn-ghost pixel-btn-sm">不再提示</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ============ 标题页 ============ -->
   <section id="screen-title" class="screen active">
     <div id="starfield" aria-hidden="true"></div>
@@ -524,6 +535,7 @@
   <script src="js/map.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/ada.js"></script>
+  <script src="js/install-guide.js"></script>
   <script src="js/quests.js"></script>
   <script src="js/settle.js"></script>
   <script src="js/meditation.js"></script>

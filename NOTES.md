@@ -27,6 +27,7 @@
 │   ├── ui.js             通用 UI：黑场过场、屏幕切换、飘字/提示/鼠标飘字、
 │   │                     状态栏(含今日目标/终极横幅)、大厅入口绑定
 │   ├── ada.js            阿黛事件系统：事件驱动对话 + 表情切换 + 队列/优先级/冷却
+│   ├── install-guide.js  安装到主屏幕引导：手机未安装时大厅底部悬浮气泡 + 关闭逻辑
 │   ├── quests.js         委托板：打卡型/记录型双模式、执念、每日重置、赏金计数
 │   ├── settle.js         勇者传记(编年史)：战报统计、委托明细带执念、发愿对照、编年史
 │   ├── meditation.js     静思庭：今日发愿、随时反思、历史、每日发愿提示
@@ -40,7 +41,7 @@
     └── optimize-images.js 图片瘦身脚本（阿黛 2048→512、背景 2560→1920，输出 img/opt/）
 ```
 
-脚本加载顺序（依赖关系）：`storage → game → audio → map → ui → quests → settle → meditation → map-ui → qiankun → main`。全局命名空间 `XH`，各模块挂 `XH.xxx`。
+脚本加载顺序（依赖关系）：`storage → game → audio → map → ui → ada → install-guide → quests → settle → meditation → map-ui → qiankun → main`。全局命名空间 `XH`，各模块挂 `XH.xxx`。
 
 ---
 
@@ -77,6 +78,7 @@
 - `viewport` meta 加 `viewport-fit=cover`；`<head>` 内加 manifest 链接、`theme-color`、iOS 三件套（apple-mobile-web-app-capable / status-bar-style black-translucent / apple-mobile-web-app-title）+ `apple-touch-icon`（`img/icon-chronicle.png`）。
 - 无 service worker、无离线缓存（本任务范围外）。
 - 弹窗防溢出：`.modal` 加 `max-height: 90vh/90dvh` + `overflow-y: auto`（内容超高时内部滚动）+ `overscroll-behavior: contain`；`.modal-actions` 加 `position: sticky; bottom: 0` + `flex-shrink: 0` + `padding-bottom: env(safe-area-inset-bottom)`，使发布/取消按钮始终可见可点；横屏紧凑模式压缩弹窗外边距（8px）与字段间距（字号保持 ≥14px 防 iOS 聚焦放大）。
+- 安装到主屏幕引导：新增 `install-guide.js`——仅触屏、非 standalone、横屏、未安装且首次进大厅时，延迟 2 秒在底部悬浮气泡，分 iOS/Android 文案；「知道了」写 sessionStorage（本次会话）、「不再提示」写存档 `installGuideDismissed`（永久）。桌面/竖屏遮罩/已安装均不显示。
 
 ### 阿黛事件系统 · 18 触发点
 
@@ -147,6 +149,7 @@ localStorage key：`xuehai_save_v1`。顶层结构：
   bounty:     { quest: {date, gold}, node: {date, gold} },
   meditation: { vows: [], reflections: [], lastPromptDate },
   loginStreak: { count, lastDate },
+  installGuideDismissed: false,
   chronicle: [{ date, nodesLit, questsDone, power, exp, gold, note, questDetails, savedAt }],
   log:       [{ type, source, power, exp, gold, at }]
 }

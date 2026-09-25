@@ -1,19 +1,16 @@
 /* ============================================================
-   学海大陆 · 8-bit 音效系统（Web Audio 实时合成，无外部文件）
-   方波/三角波/锯齿波 + 噪声，红白机 chiptune 风格。
-   AudioContext 在首次用户交互后才初始化，规避自动播放限制。
+   学海大陆 · 音效系统（audio/ mp3 文件，懒加载）
+   统一接口 XH.audio.play('name')；壁炉环境音与血手印蓄力走专用函数。
+   静音开关迁入存档 audioMuted，旧 localStorage xuehai_muted 兜底迁移。
    ============================================================ */
 (function () {
   'use strict';
   const XH = (window.XH = window.XH || {});
 
-  const MUTE_KEY = 'xuehai_muted';
-  let ctx = null;
+  const MUTE_KEY = 'xuehai_muted';   // 旧静音 key，仅迁移/兜底用
+  let ctx = null;      // 保留 master 总线（当前无合成音效，仅占位，便于日后回退/扩展）
   let master = null;
-  let noiseBuf = null;
   let muted = false;
-  let chargeOsc = null;
-  let chargeGain = null;
 
   function ensureCtx() {
     if (!ctx) {
@@ -21,181 +18,32 @@
       if (!AC) return null;
       ctx = new AC();
       master = ctx.createGain();
-      master.gain.value = 0.4; // 总音量克制，点缀而非轰炸
+      master.gain.value = 0.4;
       master.connect(ctx.destination);
     }
     if (ctx.state === 'suspended') ctx.resume();
     return ctx;
   }
 
-  function getNoise(c) {
-    if (!noiseBuf) {
-      noiseBuf = c.createBuffer(1, c.sampleRate, c.sampleRate);
-      const d = noiseBuf.getChannelData(0);
-      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    }
-    return noiseBuf;
-  }
-
-  /* 单音：振荡器 + 包络 */
-  function tone(o) {
-    const c = ensureCtx();
-    if (!c || !master) return;
-    const t0 = c.currentTime + (o.at || 0);
-    const osc = c.createOscillator();
-    const g = c.createGain();
-    osc.type = o.type || 'square';
-    osc.frequency.setValueAtTime(o.freq, t0);
-    if (o.slideTo) osc.frequency.exponentialRampToValueAtTime(Math.max(1, o.slideTo), t0 + o.dur);
-    const vol = o.vol != null ? o.vol : 0.15;
-    const attack = o.attack != null ? o.attack : 0.002;
-    const release = o.release != null ? o.release : 0.03;
-    g.gain.setValueAtTime(0.0001, t0);
-    g.gain.linearRampToValueAtTime(vol, t0 + attack);
-    g.gain.setValueAtTime(vol, Math.max(t0 + attack, t0 + o.dur - release));
-    g.gain.linearRampToValueAtTime(0.0001, t0 + o.dur);
-    osc.connect(g);
-    g.connect(master);
-    osc.start(t0);
-    osc.stop(t0 + o.dur + 0.05);
-  }
-
-  /* 噪声：缓冲源 + 滤波器 + 包络 */
-  function noise(o) {
-    const c = ensureCtx();
-    if (!c || !master) return;
-    const t0 = c.currentTime + (o.at || 0);
-    const src = c.createBufferSource();
-    src.buffer = getNoise(c);
-    src.loop = true;
-    const f = c.createBiquadFilter();
-    f.type = o.filterType || 'lowpass';
-    f.frequency.setValueAtTime(o.filterFreq || 3000, t0);
-    const g = c.createGain();
-    const vol = o.vol != null ? o.vol : 0.12;
-    const attack = o.attack != null ? o.attack : 0.005;
-    const release = o.release != null ? o.release : 0.05;
-    g.gain.setValueAtTime(0.0001, t0);
-    g.gain.linearRampToValueAtTime(vol, t0 + attack);
-    g.gain.setValueAtTime(vol, Math.max(t0 + attack, t0 + o.dur - release));
-    g.gain.linearRampToValueAtTime(0.0001, t0 + o.dur);
-    src.connect(f);
-    f.connect(g);
-    g.connect(master);
-    src.start(t0);
-    src.stop(t0 + o.dur + 0.05);
-  }
-
-  /* ---------- 音效实现 ---------- */
-  function sClick() { tone({ freq: 1000, type: 'square', dur: 0.03, vol: 0.08, release: 0.02 }); }
-
-  function sTransition() {
-    // 三角波上扬+回落，透亮的"咻"而不是闷"嗡"
-    tone({ freq: 160, slideTo: 400, type: 'triangle', dur: 0.12, vol: 0.14 });
-    tone({ freq: 400, slideTo: 130, type: 'triangle', dur: 0.22, vol: 0.11, at: 0.11 });
-  }
-
-  function sLight() {
-    [523.25, 659.25, 783.99].forEach(function (f, i) {
-      tone({ freq: f, type: 'square', dur: 0.1, vol: 0.15, at: i * 0.075, release: 0.06 });
-    });
-  }
-
-  function sGold() {
-    tone({ freq: 987.77, type: 'square', dur: 0.08, vol: 0.14, release: 0.03 });
-    tone({ freq: 1318.51, type: 'square', dur: 0.3, vol: 0.14, at: 0.08, release: 0.08 });
-  }
-
-  function sTransmit(level) {
-    tone({ freq: 480 * Math.pow(1.1, level || 0), type: 'triangle', dur: 0.055, vol: 0.07, release: 0.03 });
-  }
-
-  function sLevelUp() {
-    [523.25, 659.25, 783.99, 1046.5].forEach(function (f, i) {
-      tone({ freq: f, type: 'square', dur: i === 3 ? 0.32 : 0.1, vol: 0.15, at: i * 0.09, release: i === 3 ? 0.1 : 0.05 });
-    });
-  }
-
-  function sRegionClear() {
-    [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5].forEach(function (f, i) {
-      tone({ freq: f, type: 'square', dur: i === 5 ? 0.4 : 0.11, vol: 0.15, at: i * 0.1, release: i === 5 ? 0.12 : 0.05 });
-    });
-  }
-
-  function sConquer() {
-    const seq = [
-      [392.0, 0.12, 0],
-      [392.0, 0.12, 0.13],
-      [392.0, 0.16, 0.26],
-      [523.25, 0.16, 0.44],
-      [659.25, 0.18, 0.62],
-      [783.99, 0.2, 0.82],
-      [1046.5, 0.65, 1.04]
-    ];
-    seq.forEach(function (s) {
-      tone({ freq: s[0], type: 'square', dur: s[1], vol: 0.17, at: s[2], release: 0.08 });
-    });
-    [523.25, 659.25, 783.99, 1046.5].forEach(function (f) {
-      tone({ freq: f, type: 'square', dur: 0.6, vol: 0.08, at: 1.72, release: 0.2 });
-    });
-  }
-
-  /* 血手印：持续蓄力音，音调随进度升高 */
-  function startCharge() {
-    const c = ensureCtx();
-    if (!c || !master || muted) return;
-    stopCharge();
-    chargeOsc = c.createOscillator();
-    chargeGain = c.createGain();
-    const f = c.createBiquadFilter();
-    f.type = 'lowpass';
-    f.frequency.value = 320;
-    chargeOsc.type = 'sawtooth';
-    chargeOsc.frequency.value = 70;
-    chargeGain.gain.value = 0.12;
-    chargeOsc.connect(f);
-    f.connect(chargeGain);
-    chargeGain.connect(master);
-    chargeOsc.start();
-  }
-  function updateCharge(p) {
-    if (chargeOsc) chargeOsc.frequency.value = 70 + (p || 0) * 150;
-  }
-  function stopCharge() {
-    if (chargeOsc) {
-      try { chargeOsc.stop(); chargeOsc.disconnect(); } catch (e) {}
-      chargeOsc = null;
-    }
-    if (chargeGain) {
-      try { chargeGain.disconnect(); } catch (e) {}
-      chargeGain = null;
-    }
-  }
-  function sContract() {
-    tone({ freq: 100, slideTo: 35, type: 'sine', dur: 0.6, vol: 0.45, attack: 0.006, release: 0.3 });
-    tone({ freq: 55, type: 'sine', dur: 0.5, vol: 0.35, attack: 0.006, release: 0.25 });
-    noise({ dur: 0.2, vol: 0.22, filterType: 'lowpass', filterFreq: 600, attack: 0.004, release: 0.1 });
-  }
-
-  function sError() {
-    // 两拍下降三角波，轻脆的"den-den"拒绝音
-    tone({ freq: 260, type: 'triangle', dur: 0.07, vol: 0.12 });
-    tone({ freq: 195, type: 'triangle', dur: 0.1, vol: 0.12, at: 0.07 });
-  }
-
-  function sType() { tone({ freq: 240, type: 'triangle', dur: 0.02, vol: 0.03, release: 0.012 }); }
-
-  function sPageFlip() { noise({ dur: 0.22, vol: 0.1, filterType: 'bandpass', filterFreq: 1800, attack: 0.03, release: 0.12 }); }
-
-  /* ---------- 文件音效（audio/ 目录，懒加载 + 每音效音量系数） ----------
-     与上方 8-bit 合成音效共存：play(name) 先查 FILE_SFX，命中走文件，否则回落合成。 */
+  /* ---------- 音效注册表（audio/ 目录，懒加载 + 每音效音量系数） ----------
+     vol = 基础音量(0–1)，coeff = 音量系数（独立微调档），loop = 循环 */
   const FILE_SFX = {
-    click:     { src: 'audio/sfx-click.mp3',     vol: 0.4, coeff: 1.0 },
-    page:      { src: 'audio/sfx-page.mp3',      vol: 0.5, coeff: 1.5 },
-    quill:     { src: 'audio/sfx-quill.mp3',     vol: 0.5, coeff: 1.0 },
-    paper:     { src: 'audio/sfx-paper.mp3',     vol: 0.5, coeff: 1.0 },
-    coin:      { src: 'audio/sfx-coin.mp3',      vol: 0.5, coeff: 1.0 },
-    fireplace: { src: 'audio/sfx-fireplace.mp3', vol: 0.3, coeff: 1.0, loop: true }
+    click:       { src: 'audio/sfx-click.mp3',       vol: 0.6,  coeff: 1.0 },
+    transition:  { src: 'audio/sfx-transition.mp3',  vol: 0.25, coeff: 1.0 },
+    light:       { src: 'audio/sfx-light.mp3',       vol: 0.45, coeff: 1.0 },
+    transmit:    { src: 'audio/sfx-transmit.mp3',    vol: 0.35, coeff: 1.0 },
+    levelup:     { src: 'audio/sfx-levelup.mp3',     vol: 0.5,  coeff: 1.0 },
+    regionclear: { src: 'audio/sfx-regionclear.mp3', vol: 0.5,  coeff: 1.0 },
+    conquer:     { src: 'audio/sfx-conquer.mp3',     vol: 0.5,  coeff: 1.0 },
+    contract:    { src: 'audio/sfx-contract.mp3',    vol: 0.55, coeff: 1.0 },
+    error:       { src: 'audio/sfx-error.mp3',       vol: 0.4,  coeff: 1.0 },
+    type:        { src: 'audio/sfx-type.mp3',        vol: 0.3,  coeff: 1.0 },
+    charge:      { src: 'audio/sfx-charge.mp3',      vol: 0.4,  coeff: 1.0, loop: true },
+    page:        { src: 'audio/sfx-page.mp3',        vol: 0.5,  coeff: 1.5 },
+    quill:       { src: 'audio/sfx-quill.mp3',       vol: 0.5,  coeff: 1.0 },
+    paper:       { src: 'audio/sfx-paper.mp3',       vol: 0.5,  coeff: 1.0 },
+    coin:        { src: 'audio/sfx-coin.mp3',        vol: 0.5,  coeff: 1.0 },
+    fireplace:   { src: 'audio/sfx-fireplace.mp3',   vol: 0.3,  coeff: 1.0, loop: true }
   };
   const sfxCache = {};   // name → HTMLAudioElement（懒加载）
 
@@ -221,6 +69,28 @@
     if (p && p.catch) p.catch(function () { /* 自动播放被拦，忽略 */ });
   }
 
+  /* 血手印蓄力：循环播放 + playbackRate 随进度 1.0→2.0 */
+  function startChargeSfx() {
+    if (muted) return;
+    const a = getSfx('charge');
+    if (!a) return;
+    a.playbackRate = 1.0;
+    a.currentTime = 0;
+    const p = a.play();
+    if (p && p.catch) p.catch(function () {});
+  }
+  function updateChargeSfx(progress) {
+    const a = sfxCache['charge'];
+    if (a) {
+      const p = Math.min(1, Math.max(0, Number(progress) || 0));
+      a.playbackRate = 1.0 + p;
+    }
+  }
+  function stopChargeSfx() {
+    const a = sfxCache['charge'];
+    if (a) { try { a.pause(); a.currentTime = 0; a.playbackRate = 1.0; } catch (e) {} }
+  }
+
   /* 大厅常驻环境音：壁炉循环，音量 ≤30% */
   function startAmbient() {
     if (muted) return;
@@ -239,25 +109,10 @@
   /* ---------- 播放接口 ---------- */
   function play(name, param) {
     if (muted) return;
+    if (name === 'chargeStart') { startChargeSfx(); return; }
+    if (name === 'charge') { updateChargeSfx(param); return; }
+    if (name === 'chargeStop') { stopChargeSfx(); return; }
     if (FILE_SFX[name]) { playSfx(name); return; }
-    if (!ensureCtx()) return;
-    switch (name) {
-      case 'click': sClick(); break;
-      case 'transition': sTransition(); break;
-      case 'light': sLight(); break;
-      case 'gold': sGold(); break;
-      case 'transmit': sTransmit(param); break;
-      case 'levelup': sLevelUp(); break;
-      case 'regionclear': sRegionClear(); break;
-      case 'conquer': sConquer(); break;
-      case 'chargeStart': startCharge(); break;
-      case 'charge': updateCharge(param); break;
-      case 'chargeStop': stopCharge(); break;
-      case 'contract': sContract(); break;
-      case 'error': sError(); break;
-      case 'type': sType(); break;
-      case 'pageflip': sPageFlip(); break;
-    }
   }
 
   /* ---------- 静音开关 ---------- */
@@ -273,7 +128,7 @@
       XH.storage.save(XH.state);
     }
     try { localStorage.setItem(MUTE_KEY, muted ? '1' : '0'); } catch (e) {} // 旧 key 兜底
-    if (muted) { stopCharge(); stopAmbient(); }
+    if (muted) { stopChargeSfx(); stopAmbient(); }
     applyMuteIcon();
   }
 
@@ -303,7 +158,7 @@
       }
     });
 
-    // 首次交互即初始化 AudioContext（自动播放策略）
+    // 首次交互即初始化 AudioContext（保留 master 总线；当前 mp3 无需，保留以便日后回退/扩展）
     const resume = function () {
       ensureCtx();
       document.removeEventListener('pointerdown', resume);

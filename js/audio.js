@@ -149,10 +149,11 @@
     const btn = document.getElementById('btn-mute');
     if (btn) btn.addEventListener('click', toggleMute);
 
-    // 通用 UI 点击音（按钮/入口/面包屑/区域卡）
+    // 通用 UI 点击音（按钮/入口/面包屑/区域卡）；开场「开始冒险」只响 transition，跳过 click
     document.addEventListener('click', function (e) {
       const t = e.target;
       if (!t || !t.closest) return;
+      if (t.closest('#btn-start')) return;
       if (t.closest('button') || t.closest('.station') || t.closest('.crumb') || t.closest('.node-card.region')) {
         play('click');
       }

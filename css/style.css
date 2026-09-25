@@ -632,10 +632,10 @@ body:has(#screen-meditation.active) .page-bg-shade {
 .station-map::after { left: 0; transform: none; }
 .station-meditate::after { left: auto; right: 0; transform: none; }
 
-.station-map      { left: 9%; bottom: 11%; }
-.station-board    { left: 32%; bottom: 10%; }
-.station-settle   { left: 55%; bottom: 11%; }
-.station-meditate { left: 78%; bottom: 11%; }
+.station-map      { left: 9%; bottom: 2%; }
+.station-board    { left: 32%; bottom: 1%; }
+.station-settle   { left: 55%; bottom: 2%; }
+.station-meditate { left: 74%; bottom: 2%; }
 
 /* NPC 对话框 */
 .npc-dialog {
@@ -1441,6 +1441,8 @@ body:has(#screen-meditation.active) .page-bg-shade {
   .station-icon { width: 42px; height: 42px; }
   .station-icon .station-img { width: 28px; height: 28px; }
   .station-label { font-size: 9px; margin-top: 2px; padding: 2px 5px; letter-spacing: 1px; }
+  /* 卡片整体下移后，紧凑矮场景里略回落，给标签留呼吸空间 */
+  .station-map, .station-board, .station-settle, .station-meditate { bottom: 5%; }
 
   /* 阿黛对话条压缩 */
   .npc-dialog { gap: 10px; padding: 6px 10px; }

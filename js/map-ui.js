@@ -299,7 +299,7 @@
 
     if (XH.audio) {
       XH.audio.play('light');
-      if (!reward.capped) setTimeout(function () { XH.audio.play('gold'); }, 230);
+      if (!reward.capped) setTimeout(function () { XH.audio.play('coin'); }, 230);
     }
 
     // 1. 叶子卡片点亮动画

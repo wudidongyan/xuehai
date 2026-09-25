@@ -26,6 +26,7 @@
     if (XH.state) XH.quests.ensureDailyReset(XH.state);
 
     document.getElementById('btn-start').addEventListener('click', function () {
+      if (XH.audio) XH.audio.play('transition');
       if (XH.state) {
         // 已有存档：直接进入大厅
         XH.ui.renderHall();

@@ -29,7 +29,6 @@
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
         ov.classList.add('fade-in');
-        if (XH.audio) XH.audio.play('transition');
         setTimeout(function () {
           if (mid) mid();
           ov.classList.remove('fade-in');

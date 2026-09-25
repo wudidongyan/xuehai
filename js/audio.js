@@ -29,7 +29,7 @@
      vol = 基础音量(0–1)，coeff = 音量系数（独立微调档），loop = 循环 */
   const FILE_SFX = {
     click:       { src: 'audio/sfx-click.mp3',       vol: 0.6,  coeff: 1.0 },
-    transition:  { src: 'audio/sfx-transition.mp3',  vol: 0.25, coeff: 1.0 },
+    transition:  { src: 'audio/sfx-transition.mp3',  vol: 0.4,  coeff: 1.0 },
     light:       { src: 'audio/sfx-light.mp3',       vol: 0.45, coeff: 1.0 },
     transmit:    { src: 'audio/sfx-transmit.mp3',    vol: 0.35, coeff: 1.0 },
     levelup:     { src: 'audio/sfx-levelup.mp3',     vol: 0.5,  coeff: 1.0 },

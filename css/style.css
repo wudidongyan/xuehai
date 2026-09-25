@@ -1504,3 +1504,62 @@ body:has(#screen-hall.active) .install-guide.open {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ============================================================
+   新手教学遮罩（阿黛向导式分步引导）
+   ============================================================ */
+.tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: none;
+  pointer-events: none;
+}
+.tutorial-overlay.open { display: block; }
+.tutorial-blocker {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.75);
+  pointer-events: auto;
+}
+.tutorial-spotlight {
+  position: fixed;
+  z-index: 1;
+  border: 3px solid var(--gold);
+  box-shadow: 0 0 0 3px #000, 0 0 20px 8px rgba(255, 215, 0, 0.45);
+  pointer-events: none;
+}
+.tutorial-bubble {
+  position: fixed;
+  z-index: 2;
+  max-width: min(92vw, 360px);
+  display: none;
+  gap: 10px;
+  padding: 12px 14px;
+  align-items: flex-start;
+  pointer-events: auto;
+}
+.tutorial-ada-img {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  object-fit: cover;
+  image-rendering: pixelated;
+  border: 2px solid #000;
+  box-shadow: 3px 3px 0 #000;
+  background: var(--panel-dark);
+}
+.tutorial-body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.tutorial-text { font-size: 13px; color: var(--text); line-height: 1.9; }
+.tutorial-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+body.tutorial-open .screen { overflow: hidden; }
+body.tutorial-open .npc-dialog { display: none; }
+
+/* 教学气泡进出场：opacity + translateY，≤200ms，will-change 仅在动画期间 */
+.tutorial-bubble.enter {
+  animation: tutorialIn 0.18s ease-out both;
+  will-change: transform, opacity;
+}
+@keyframes tutorialIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

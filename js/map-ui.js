@@ -144,6 +144,7 @@
     const cont = XH.map.createContinent(XH.state, name, reason, battleDay);
     XH.storage.save(XH.state);
     hideOverlay('continent-modal-overlay');
+    if (XH.ada) XH.ada.trigger('continent_created');
     openContinent(cont.id);
   }
 

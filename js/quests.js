@@ -325,6 +325,7 @@
     XH.storage.save(XH.state);
     $('quest-modal-overlay').classList.remove('open');
     render();
+    if (XH.ada) XH.ada.trigger('quest_created');
   }
 
   function bind() {

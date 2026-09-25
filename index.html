@@ -59,6 +59,22 @@
     </div>
   </div>
 
+  <!-- 新手教学遮罩（阿黛向导式分步引导） -->
+  <div id="tutorial-overlay" class="tutorial-overlay">
+    <div class="tutorial-blocker" id="tutorial-b-top"></div>
+    <div class="tutorial-blocker" id="tutorial-b-bottom"></div>
+    <div class="tutorial-blocker" id="tutorial-b-left"></div>
+    <div class="tutorial-blocker" id="tutorial-b-right"></div>
+    <div class="tutorial-spotlight" id="tutorial-spotlight"></div>
+    <div class="tutorial-bubble pixel-panel" id="tutorial-bubble">
+      <img class="tutorial-ada-img" id="tutorial-ada-img" src="img/opt/ada-smile.png" alt="阿黛">
+      <div class="tutorial-body">
+        <p class="tutorial-text zh" id="tutorial-text"></p>
+        <div class="tutorial-actions" id="tutorial-actions"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ============ 标题页 ============ -->
   <section id="screen-title" class="screen active">
     <div id="starfield" aria-hidden="true"></div>
@@ -511,6 +527,7 @@
       <textarea id="qiankun-import" class="pixel-input pixel-textarea zh" placeholder="在此粘贴存档码……"></textarea>
       <p id="qiankun-import-error" class="ritual-error zh"></p>
       <div class="modal-actions">
+        <button id="btn-tutorial-reset" class="pixel-btn pixel-btn-ghost">重看教学</button>
         <button id="btn-qiankun-close" class="pixel-btn pixel-btn-ghost">关闭</button>
         <button id="btn-qiankun-import" class="pixel-btn">导入存档</button>
       </div>
@@ -536,6 +553,7 @@
   <script src="js/ui.js"></script>
   <script src="js/ada.js"></script>
   <script src="js/install-guide.js"></script>
+  <script src="js/tutorial.js"></script>
   <script src="js/quests.js"></script>
   <script src="js/settle.js"></script>
   <script src="js/meditation.js"></script>

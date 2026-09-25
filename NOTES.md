@@ -28,6 +28,7 @@
 │   │                     状态栏(含今日目标/终极横幅)、大厅入口绑定
 │   ├── ada.js            阿黛事件系统：事件驱动对话 + 表情切换 + 队列/优先级/冷却
 │   ├── install-guide.js  安装到主屏幕引导：手机未安装时大厅底部悬浮气泡 + 关闭逻辑
+│   ├── tutorial.js       阿黛向导式新手教学：分步引导 + 遮罩高亮 + 断点续学
 │   ├── quests.js         委托板：打卡型/记录型双模式、执念、每日重置、赏金计数
 │   ├── settle.js         勇者传记(编年史)：战报统计、委托明细带执念、发愿对照、编年史
 │   ├── meditation.js     静思庭：今日发愿、随时反思、历史、每日发愿提示
@@ -41,7 +42,7 @@
     └── optimize-images.js 图片瘦身脚本（阿黛 2048→512、背景 2560→1920，输出 img/opt/）
 ```
 
-脚本加载顺序（依赖关系）：`storage → game → audio → map → ui → ada → install-guide → quests → settle → meditation → map-ui → qiankun → main`。全局命名空间 `XH`，各模块挂 `XH.xxx`。
+脚本加载顺序（依赖关系）：`storage → game → audio → map → ui → ada → install-guide → tutorial → quests → settle → meditation → map-ui → qiankun → main`。全局命名空间 `XH`，各模块挂 `XH.xxx`。
 
 ---
 
@@ -68,6 +69,8 @@
 **乾坤袋**：存档码导出（UTF-8/Base64、一键复制）；导入（校验、二次确认、刷新恢复）。
 
 **全局**：8-bit 音效 12 种 + 静音开关；localStorage 存档（跨天重置、旧存档自动迁移）；性能优化（进度条 scaleX、动画只用 transform/opacity、图片 opt 瘦身、内页背景预加载）。
+
+**新手教学**（`tutorial.js`）：阿黛向导式分步引导——首次进大厅触发，共 8 步、四张入口卡全部登场：欢迎→地图入口→开辟新大陆→静思庭（启程）→委托板→打卡→编年史（结束）→结业；半透明遮罩 + 高亮光圈 + 气泡，靠真实操作推进（城池创建/委托发布/打卡/反思/打开编年史事件）；存档 `tutorial` 字段断点续学，乾坤袋「重看教学」可重置；教学中常规阿黛事件静默、NPC 气泡隐藏。
 
 **移动端横屏适配**（`css/style.css` 末尾）：判定用 `pointer: coarse`（主输入为触屏）+ `orientation`——桌面 `pointer: fine` 不命中，拖窄窗口零影响。
 - 竖屏遮罩：`(pointer: coarse) and (orientation: portrait)` 显示全屏旋转遮罩（CSS 画的手机旋转动画 + "请旋转手机，横屏开始冒险"）。
@@ -150,6 +153,7 @@ localStorage key：`xuehai_save_v1`。顶层结构：
   meditation: { vows: [], reflections: [], lastPromptDate },
   loginStreak: { count, lastDate },
   installGuideDismissed: false,
+  tutorial: { step, done },
   chronicle: [{ date, nodesLit, questsDone, power, exp, gold, note, questDetails, savedAt }],
   log:       [{ type, source, power, exp, gold, at }]
 }
@@ -201,3 +205,10 @@ localStorage key：`xuehai_save_v1`。顶层结构：
 - **删除节点的奖励回退**：删除已点亮节点不会退还已发放的金币/经验（战力因派生会自动下降）。
 - **入口图标与背景物件的像素级对齐**：四入口仍按原有布局，未与 `hall-bg.png` 中对应物件精确对齐。
 - **"未来正式版完整继承"**：存档码已带版本号 + 迁移逻辑，但尚无真正的正式版发布/版本升级场景。
+
+---
+
+## 七、部署状态
+
+- **正式域名**：`xuehai.ink`（已实名认证，DNS 已解析，GitHub Pages 已绑定并开启 HTTPS）。
+- **GitHub Pages 原地址**：`https://wudidongyan.github.io/xuehai/`，保留自动跳转至正式域名 `xuehai.ink`。

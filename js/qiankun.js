@@ -66,6 +66,10 @@
     $('btn-qiankun-close').addEventListener('click', function () {
       $('qiankun-modal-overlay').classList.remove('open');
     });
+    $('btn-tutorial-reset').addEventListener('click', function () {
+      $('qiankun-modal-overlay').classList.remove('open');
+      if (XH.tutorial) XH.tutorial.reset();
+    });
     $('btn-qiankun-import').addEventListener('click', doImport);
     $('btn-qiankun-confirm-ok').addEventListener('click', confirmImport);
     $('btn-qiankun-confirm-cancel').addEventListener('click', function () {

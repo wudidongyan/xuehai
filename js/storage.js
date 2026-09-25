@@ -90,6 +90,7 @@
       },
       loginStreak: { count: 0, lastDate: '' },  // 连续上线天数（阿黛事件）
       installGuideDismissed: false, // 安装到主屏幕引导：永久关闭标记
+      tutorial: { step: 0, done: false }, // 新手教学：当前步 + 是否完成
       chronicle: [],     // 编年史：{ date, nodesLit, questsDone, power, exp, gold, note, questDetails, savedAt }
       log: []            // 日志：{ type, source, power, exp, gold, at }
     };
@@ -141,6 +142,15 @@
       }
       // 安装到主屏幕引导：永久关闭标记（旧存档补齐，缺省 false）
       if (typeof state.installGuideDismissed !== 'boolean') state.installGuideDismissed = false;
+      // 新手教学：旧存档补齐（非新手默认 done:true 不弹教学）
+      if (!state.tutorial || typeof state.tutorial.done !== 'boolean' || typeof state.tutorial.step !== 'number') {
+        const hasProgress =
+          (state.continents && state.continents.length > 0) ||
+          (state.quests && state.quests.some(function (q) {
+            return q.status === 'lit' || (q.records && q.records.length > 0);
+          }));
+        state.tutorial = { step: 0, done: hasProgress };
+      }
       return state;
     },
 

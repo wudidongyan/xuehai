@@ -136,6 +136,21 @@
       '写下来就是你的了，谁都抢不走。',
       '记录下的每一步，都会在编年史里留痕。',
       '静下来想想，也是一种远征。'
+    ] },
+    // 19. 城池创建（教学埋点，亦有常规台词）
+    continent_created: { expr: 'laugh', priority: 40, lines: [
+      '城池已立下！这片大陆，因你而有了名字。',
+      '新城池落成，愿它的火光早日亮起。'
+    ] },
+    // 20. 委托发布（教学埋点，亦有常规台词）
+    quest_created: { expr: 'smile', priority: 20, lines: [
+      '委托已发布，记得按时来打卡。',
+      '新委托挂上板了，可别忘了完成。'
+    ] },
+    // 21. 打开编年史（教学埋点，亦有常规台词）
+    chronicle_opened: { expr: 'smile', priority: 20, lines: [
+      '翻翻编年史，看看今天的战报吧。',
+      '每一步都记在编年史里了。'
     ] }
   };
 
@@ -162,6 +177,8 @@
   let npcTimer = null;
   let npcFullText = '';
   let npcTyping = false;
+  let silenced = false;    // 教学期间静默常规台词
+  const subscribers = {};  // 事件订阅者（教学等）
 
   function today() { return XH.util.localDateKey(new Date()); }
 
@@ -260,10 +277,29 @@
     }
   }
 
+  /* ---------- 订阅 / 静默（供教学等外部组件复用） ---------- */
+  function on(eventId, fn) {
+    (subscribers[eventId] = subscribers[eventId] || []).push(fn);
+    return function off() {
+      const list = subscribers[eventId];
+      if (!list) return;
+      const i = list.indexOf(fn);
+      if (i >= 0) list.splice(i, 1);
+    };
+  }
+  function setSilenced(v) { silenced = !!v; }
+
   /* ---------- 核心触发 ---------- */
   function trigger(eventId, params) {
     const ev = EVENTS[eventId];
     if (!ev) return;
+    // 通知订阅者（教学等），无论冷却/静默（拷贝遍历，防订阅回调内退订）
+    const subs = subscribers[eventId];
+    if (subs && subs.length) {
+      const copy = subs.slice();
+      for (let i = 0; i < copy.length; i++) copy[i](params);
+    }
+    if (silenced) return;          // 教学静默：不播放常规台词
     if (!canTrigger(eventId)) return;
     lastAt[eventId] = Date.now();
 
@@ -338,5 +374,5 @@
     if (urgent) trigger('battle_day');
   }
 
-  XH.ada = { trigger: trigger, chat: chat, onHallEnter: onHallEnter, setExpression: setExpression };
+  XH.ada = { trigger: trigger, chat: chat, onHallEnter: onHallEnter, setExpression: setExpression, on: on, setSilenced: setSilenced };
 })();

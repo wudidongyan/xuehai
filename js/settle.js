@@ -183,6 +183,7 @@
     const today = XH.util.localDateKey(new Date());
     const existing = (XH.state.chronicle || []).find(function (c) { return c.date === today; });
     $('settle-note').value = existing ? existing.note : '';
+    if (XH.ada) XH.ada.trigger('chronicle_opened');
     XH.ui.showScreen('screen-settle');
   }
 

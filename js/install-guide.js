@@ -31,6 +31,7 @@
 
   function onHallEnter() {
     if (triggered) return;
+    if (XH.tutorial && XH.tutorial.isActive()) return; // 教学期间不打扰
     if (!isTouch()) return;                       // 桌面端不显示
     if (isStandalone()) return;                   // 已安装（standalone）不显示
     if (isPortrait()) return;                     // 竖屏遮罩状态下不显示

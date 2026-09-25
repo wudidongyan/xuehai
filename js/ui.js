@@ -61,8 +61,10 @@
       setTimeout(function () { target.style.willChange = ''; }, 260);
       if (id === 'screen-hall') {
         preloadInnerBackgrounds();
+        if (XH.tutorial) XH.tutorial.onHallEnter();
         if (XH.installGuide) XH.installGuide.onHallEnter();
       }
+      if (XH.tutorial) XH.tutorial.onScreen(id);
     }, function () {
       screenSwitching = false;
     });

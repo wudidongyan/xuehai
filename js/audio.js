@@ -190,6 +190,7 @@
   /* ---------- 文件音效（audio/ 目录，懒加载 + 每音效音量系数） ----------
      与上方 8-bit 合成音效共存：play(name) 先查 FILE_SFX，命中走文件，否则回落合成。 */
   const FILE_SFX = {
+    click:     { src: 'audio/sfx-click.mp3',     vol: 0.4, coeff: 1.0 },
     page:      { src: 'audio/sfx-page.mp3',      vol: 0.5, coeff: 1.5 },
     quill:     { src: 'audio/sfx-quill.mp3',     vol: 0.5, coeff: 1.0 },
     paper:     { src: 'audio/sfx-paper.mp3',     vol: 0.5, coeff: 1.0 },

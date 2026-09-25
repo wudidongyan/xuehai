@@ -129,30 +129,67 @@
 
   function position() {
     const step = STEPS[currentStep];
+    if (!step) return;
+    const idx = currentStep;               // 异步回调期间可能步进，据此放弃过期定位
     const el = step.target ? document.querySelector(step.target) : null;
-    let rect = null;
-    if (el) {
-      const r = el.getBoundingClientRect();
-      if (r.width > 0 && r.height > 0) rect = r;
+
+    // 无目标：气泡居中
+    if (!step.target) {
+      drawCentered();
+      return;
     }
-    // 防死锁：有目标但定位失败（不存在/不可见/坐标为 0）→ 告警并跳过，绝不软锁死
-    if (step.target && !rect) {
-      console.warn('[教学] 目标元素不可定位，跳过当前步骤：' + step.target);
+
+    // 目标元素不存在 → 告警跳过，绝不软锁死
+    if (!el) {
+      console.warn('[教学] 目标元素不存在，跳过当前步骤：' + step.target);
       advance();
       return;
     }
-    const W = window.innerWidth, H = window.innerHeight;
 
-    if (!rect) {
-      placeBlocker('tutorial-b-top', 0, 0, W, H);
-      placeBlocker('tutorial-b-bottom', 0, 0, 0, 0);
-      placeBlocker('tutorial-b-left', 0, 0, 0, 0);
-      placeBlocker('tutorial-b-right', 0, 0, 0, 0);
-      hideSpotlight();
-      centerBubble();
+    // 先滚入视口中央再定位（程序性滚动，不受 body.tutorial-open 的用户滚动锁限制）
+    try {
+      el.scrollIntoView({ block: 'center', behavior: 'instant' });
+    } catch (e) {
+      el.scrollIntoView(true);
+    }
+
+    // 滚动结束 / 下一帧再量坐标，防止高亮与气泡错位
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        if (!active || currentStep !== idx) return;
+        measureAndDraw(step, el);
+      });
+    });
+  }
+
+  function measureAndDraw(step, el) {
+    const r = el.getBoundingClientRect();
+    const W = window.innerWidth, H = window.innerHeight;
+    const inView = r.width > 0 && r.height > 0 &&
+      r.bottom > 0 && r.top < H && r.right > 0 && r.left < W;
+
+    // 兜底升级：滚入后仍不在视口内（极端小屏 / 元素不可见）→ 告警跳过，绝不软锁死
+    if (!inView) {
+      console.warn('[教学] 目标滚入后仍不在视口内，跳过当前步骤：' + step.target);
+      advance();
       return;
     }
 
+    drawSpotlightAndBubble(r);
+  }
+
+  function drawCentered() {
+    const W = window.innerWidth, H = window.innerHeight;
+    placeBlocker('tutorial-b-top', 0, 0, W, H);
+    placeBlocker('tutorial-b-bottom', 0, 0, 0, 0);
+    placeBlocker('tutorial-b-left', 0, 0, 0, 0);
+    placeBlocker('tutorial-b-right', 0, 0, 0, 0);
+    hideSpotlight();
+    centerBubble();
+  }
+
+  function drawSpotlightAndBubble(rect) {
+    const W = window.innerWidth, H = window.innerHeight;
     const pad = 8;
     const x0 = rect.left - pad, y0 = rect.top - pad;
     const x1 = rect.right + pad, y1 = rect.bottom + pad;

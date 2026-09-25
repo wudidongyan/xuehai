@@ -111,12 +111,18 @@
       setTimeout(function () { bubble.classList.remove('enter'); }, 200);
     }
   }
+  /* 滚动锁只作用于「遮罩高亮激活」期间；hideOnLeave 自由导航时解除，
+     否则屏下的发布委托/反思区会被锁住够不着。 */
+  function setMasked(on) {
+    document.body.classList.toggle('tutorial-masked', on);
+  }
   function hideMask() {
     hideSpotlight();
     placeBlocker('tutorial-b-top', 0, 0, 0, 0);
     placeBlocker('tutorial-b-bottom', 0, 0, 0, 0);
     placeBlocker('tutorial-b-left', 0, 0, 0, 0);
     placeBlocker('tutorial-b-right', 0, 0, 0, 0);
+    setMasked(false);
   }
 
   function placeBlocker(id, left, top, w, h) {
@@ -179,6 +185,7 @@
   }
 
   function drawCentered() {
+    setMasked(true);
     const W = window.innerWidth, H = window.innerHeight;
     placeBlocker('tutorial-b-top', 0, 0, W, H);
     placeBlocker('tutorial-b-bottom', 0, 0, 0, 0);
@@ -189,6 +196,7 @@
   }
 
   function drawSpotlightAndBubble(rect) {
+    setMasked(true);
     const W = window.innerWidth, H = window.innerHeight;
     const pad = 8;
     const x0 = rect.left - pad, y0 = rect.top - pad;
@@ -239,9 +247,34 @@
   }
 
   /* ---------- 渲染 / 推进 / 结束 ---------- */
+  /* 步骤级兜底：进入该步前检测死锁条件，命中则自动跳过（断点续教 / 重看教学场景） */
+  function shouldSkipStep(step) {
+    // 发布委托：当日委托赏金已领完/达上限 → 跳过，防死锁
+    if (step.advanceEvent === 'quest_created') {
+      if (XH.state && XH.game && XH.game.goldToday &&
+          XH.game.goldToday(XH.state, 'quest') >= (XH.GOLD_CAPS && XH.GOLD_CAPS.quest)) {
+        console.warn('[教学] 当日委托赏金已领完，跳过「发布委托」步骤');
+        return true;
+      }
+    }
+    // 打卡：无可点击的未完成打卡委托 → 跳过，防死锁
+    if (step.advanceEvent === 'quest_done') {
+      const hasPending = ((XH.state && XH.state.quests) || []).some(function (q) {
+        return q.type !== 'record' && q.status !== 'lit';
+      });
+      if (!hasPending) {
+        console.warn('[教学] 无未完成的打卡委托，跳过「打卡」步骤');
+        return true;
+      }
+    }
+    return false;
+  }
+
   function renderStep(index) {
     currentStep = index;
     const step = STEPS[index];
+    if (!step) return;
+    if (shouldSkipStep(step)) { advance(); return; }
     hideSpotlight();
     hideBubble();
     setText(step.text, step.expr);
@@ -278,7 +311,7 @@
     unsubscribe();
     clearTimeout(pendingTimer);
     if (XH.ada) XH.ada.setSilenced(false);
-    document.body.classList.remove('tutorial-open');
+    document.body.classList.remove('tutorial-open', 'tutorial-masked');
     const ov = $('tutorial-overlay');
     if (ov) ov.classList.remove('open');
   }

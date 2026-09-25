@@ -1551,7 +1551,7 @@ body:has(#screen-hall.active) .install-guide.open {
 .tutorial-body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .tutorial-text { font-size: 13px; color: var(--text); line-height: 1.9; }
 .tutorial-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-body.tutorial-open .screen { overflow: hidden; }
+body.tutorial-open.tutorial-masked .screen { overflow: hidden; }
 body.tutorial-open .npc-dialog { display: none; }
 
 /* 教学气泡进出场：opacity + translateY，≤200ms，will-change 仅在动画期间 */

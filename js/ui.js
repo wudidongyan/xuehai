@@ -64,6 +64,7 @@
         if (XH.tutorial) XH.tutorial.onHallEnter();
         if (XH.installGuide) XH.installGuide.onHallEnter();
       }
+      if (XH.audio) { if (id === 'screen-hall') XH.audio.startAmbient(); else XH.audio.stopAmbient(); }
       if (XH.tutorial) XH.tutorial.onScreen(id);
     }, function () {
       screenSwitching = false;

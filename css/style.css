@@ -566,6 +566,25 @@ body:has(#screen-meditation.active) .page-bg-shade {
   50%      { opacity: 0.8;  transform: scale(1.1); }
 }
 
+/* 灯笼烛光：暖色半透明光斑，2–4s 明暗呼吸（只用 opacity） */
+.scene-light-glow {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  margin-left: -40px;
+  margin-top: -40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(243, 156, 12, 0.4), rgba(243, 156, 12, 0) 70%);
+  animation: candleBreath 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 2;
+  will-change: opacity;
+}
+@keyframes candleBreath {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 0.85; }
+}
+
 /* 可交互区域 */
 .station {
   position: absolute;
@@ -577,19 +596,23 @@ body:has(#screen-meditation.active) .page-bg-shade {
   transition: transform 0.1s steps(2);
 }
 .station:hover { transform: translateY(-6px); }
+.station:active { transform: translateY(2px); }
 .station-icon {
-  width: 86px;
-  height: 86px;
+  width: 73px;
+  height: 73px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(35, 35, 63, 0.92);
+  /* 木牌质感：CSS 渐变模拟木纹 + 半透明底，融入场景（不新增图片） */
+  background:
+    repeating-linear-gradient(100deg, rgba(0, 0, 0, 0.12) 0 2px, transparent 2px 6px),
+    linear-gradient(160deg, rgba(122, 90, 48, 0.85), rgba(84, 60, 34, 0.85));
   border: 3px solid #000;
   box-shadow: 4px 4px 0 #000;
 }
 .station-icon .station-img {
-  width: 54px;
-  height: 54px;
+  width: 46px;
+  height: 46px;
   object-fit: contain;
   image-rendering: pixelated;
 }
@@ -597,11 +620,11 @@ body:has(#screen-meditation.active) .page-bg-shade {
   box-shadow: 4px 4px 0 #000, 0 0 0 3px var(--glow-orange), 0 0 16px var(--glow-orange);
 }
 .station-label {
-  margin-top: 8px;
-  padding: 5px 9px;
+  margin-top: 6px;
+  padding: 4px 7px;
   background: #000;
   color: var(--gold);
-  font-size: 12px;
+  font-size: 10px;
   letter-spacing: 2px;
   border: 2px solid #000;
   box-shadow: 3px 3px 0 #000;
@@ -632,10 +655,10 @@ body:has(#screen-meditation.active) .page-bg-shade {
 .station-map::after { left: 0; transform: none; }
 .station-meditate::after { left: auto; right: 0; transform: none; }
 
-.station-map      { left: 9%; bottom: 2%; }
-.station-board    { left: 32%; bottom: 1%; }
-.station-settle   { left: 55%; bottom: 2%; }
-.station-meditate { left: 74%; bottom: 2%; }
+.station-map      { left: 12%; bottom: 1%; }
+.station-board    { left: 33%; bottom: 1%; }
+.station-settle   { left: 54%; bottom: 1%; }
+.station-meditate { left: 75%; bottom: 1%; }
 
 /* NPC 对话框 */
 .npc-dialog {

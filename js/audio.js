@@ -187,9 +187,58 @@
 
   function sPageFlip() { noise({ dur: 0.22, vol: 0.1, filterType: 'bandpass', filterFreq: 1800, attack: 0.03, release: 0.12 }); }
 
+  /* ---------- 文件音效（audio/ 目录，懒加载 + 每音效音量系数） ----------
+     与上方 8-bit 合成音效共存：play(name) 先查 FILE_SFX，命中走文件，否则回落合成。 */
+  const FILE_SFX = {
+    page:      { src: 'audio/sfx-page.mp3',      vol: 0.5, coeff: 1.5 },
+    quill:     { src: 'audio/sfx-quill.mp3',     vol: 0.5, coeff: 1.0 },
+    paper:     { src: 'audio/sfx-paper.mp3',     vol: 0.5, coeff: 1.0 },
+    coin:      { src: 'audio/sfx-coin.mp3',      vol: 0.5, coeff: 1.0 },
+    fireplace: { src: 'audio/sfx-fireplace.mp3', vol: 0.3, coeff: 1.0, loop: true }
+  };
+  const sfxCache = {};   // name → HTMLAudioElement（懒加载）
+
+  function getSfx(name) {
+    const cfg = FILE_SFX[name];
+    if (!cfg) return null;
+    if (!sfxCache[name]) {
+      const a = new Audio(cfg.src);
+      a.preload = 'auto';
+      a.volume = Math.min(1, (cfg.vol || 0.5) * (cfg.coeff || 1));
+      if (cfg.loop) a.loop = true;
+      sfxCache[name] = a;
+    }
+    return sfxCache[name];
+  }
+
+  function playSfx(name) {
+    if (muted) return;
+    const a = getSfx(name);
+    if (!a) return;
+    a.currentTime = 0;              // 快速重复触发时从头播
+    const p = a.play();
+    if (p && p.catch) p.catch(function () { /* 自动播放被拦，忽略 */ });
+  }
+
+  /* 大厅常驻环境音：壁炉循环，音量 ≤30% */
+  function startAmbient() {
+    if (muted) return;
+    const a = getSfx('fireplace');
+    if (!a) return;
+    if (a.paused) {
+      const p = a.play();
+      if (p && p.catch) p.catch(function () {});
+    }
+  }
+  function stopAmbient() {
+    const a = sfxCache['fireplace'];
+    if (a) { try { a.pause(); a.currentTime = 0; } catch (e) {} }
+  }
+
   /* ---------- 播放接口 ---------- */
   function play(name, param) {
     if (muted) return;
+    if (FILE_SFX[name]) { playSfx(name); return; }
     if (!ensureCtx()) return;
     switch (name) {
       case 'click': sClick(); break;
@@ -218,15 +267,23 @@
 
   function setMuted(m) {
     muted = !!m;
-    try { localStorage.setItem(MUTE_KEY, muted ? '1' : '0'); } catch (e) {}
-    if (muted) stopCharge();
+    if (XH.state) {
+      XH.state.audioMuted = muted;
+      XH.storage.save(XH.state);
+    }
+    try { localStorage.setItem(MUTE_KEY, muted ? '1' : '0'); } catch (e) {} // 旧 key 兜底
+    if (muted) { stopCharge(); stopAmbient(); }
     applyMuteIcon();
   }
 
   function toggleMute() { setMuted(!muted); }
 
   function loadMuted() {
-    try { muted = localStorage.getItem(MUTE_KEY) === '1'; } catch (e) { muted = false; }
+    if (XH.state && typeof XH.state.audioMuted === 'boolean') {
+      muted = XH.state.audioMuted;
+    } else {
+      try { muted = localStorage.getItem(MUTE_KEY) === '1'; } catch (e) { muted = false; }
+    }
   }
 
   function init() {
@@ -255,5 +312,5 @@
     document.addEventListener('keydown', resume);
   }
 
-  XH.audio = { play: play, toggleMute: toggleMute, isMuted: function () { return muted; }, init: init, ensureCtx: ensureCtx };
+  XH.audio = { play: play, toggleMute: toggleMute, isMuted: function () { return muted; }, init: init, ensureCtx: ensureCtx, startAmbient: startAmbient, stopAmbient: stopAmbient };
 })();

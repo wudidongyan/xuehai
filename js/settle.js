@@ -176,7 +176,7 @@
   }
 
   function show() {
-    if (XH.audio) XH.audio.play('pageflip');
+    if (XH.audio) XH.audio.play('page');
     renderReport();
     renderChronicle();
     // 预填今日已写的日志
@@ -200,6 +200,7 @@
       XH.storage.save(XH.state);
       $('settle-note').value = '';
       renderChronicle();
+      if (XH.audio) XH.audio.play('quill');
       XH.ui.showToast('已写入编年史');
     });
   }

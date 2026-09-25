@@ -21,7 +21,7 @@
 │   │                     util 工具(genId/localDateKey/daysUntil)、存档码(exportCode/parseCode)
 │   ├── game.js           数值核心：职业列表、奖励三档、金币双上限(grantGold/goldToday)、
 │   │                     升级公式(expNeeded/addExp)、结算(applyReward/applyFlatReward)
-│   ├── audio.js          8-bit 音效：Web Audio 实时合成 + 静音开关
+│   ├── audio.js          音效：8-bit Web Audio 合成 + audio/ mp3 文件音效（懒加载）+ 静音开关
 │   ├── map.js            迷雾地图数据模型：大陆/节点树、战力/进度/征服度、点亮(lightLeaf)、
 │   │                     终极(createContinent 含 reason/battleDay/ultimate)
 │   ├── ui.js             通用 UI：黑场过场、屏幕切换、飘字/提示/鼠标飘字、
@@ -35,6 +35,7 @@
 │   ├── map-ui.js         迷雾地图 UI：大陆列表/地图页/面包屑/点亮动画/决战日/终极弹窗
 │   ├── qiankun.js        乾坤袋：存档码导出/导入弹窗
 │   └── main.js           入口：初始化、绑定各模块、调试 API(XH.state/addExp/reset)
+├── audio/                mp3 音效素材（壁炉环境循环 + page/quill/paper/coin）
 ├── img/                  美术素材（见第七节）
 └── .asset-tools/
     ├── crop-icons.js     图标裁切脚本（Node + pngjs，裁 icons.png 为 4 张）
@@ -55,7 +56,7 @@
 **公会大厅**：
 - 状态栏：名号/职业/等级/EXP 条/金币/总战力/今日目标 X/Y/重置/乾坤袋/静音。
 - 终极远征横幅（有终极大陆时常驻显示：大陆名 + 征服度% + 倒计时）。
-- 像素场景四入口：迷雾地图 / 委托板 / 编年史（进页面为"勇者传记"）/ 静思庭；入口卡整体下移至底部暗色地板区（`bottom` 11→2%），左下壁炉完整露出，静思庭略左移少压背景右侧委托板。
+- 像素场景四入口：迷雾地图 / 委托板 / 编年史（进页面为"勇者传记"）/ 静思庭；入口卡木牌皮肤（CSS 渐变+半透明，融入场景）+ 缩约 15%（icon 86→73px）+ 四卡等距重排（left 12/33/54/75%），落底部暗色地板区（`bottom` 1%），壁炉「看得见在烧」、吧台区域可见；烛光光影：灯笼×4 + 壁炉暖色光斑，opacity 明暗呼吸。
 - 阿黛事件系统：18 个游戏事件触发她说话 + 切换表情（见下方触发点清单）。
 
 **迷雾地图**：大陆列表（名字/征服理由/总战力/进度/决战日倒计时/补绑/钦定，终极置顶金边徽记）；开辟大陆（名字+征服理由+决战日可选）；大陆内面包屑导航、区域/试炼节点、增设/删除；点亮叶子（动画+奖励+战力传导+区域肃清+大陆征服，终极触发"远征终章"）；每日征服赏金 X/50。
@@ -68,7 +69,7 @@
 
 **乾坤袋**：存档码导出（UTF-8/Base64、一键复制）；导入（校验、二次确认、刷新恢复）。
 
-**全局**：8-bit 音效 12 种 + 静音开关；localStorage 存档（跨天重置、旧存档自动迁移）；性能优化（进度条 scaleX、动画只用 transform/opacity、图片 opt 瘦身、内页背景预加载）。
+**全局**：音效——8-bit Web Audio 合成 12 种 + `audio/` mp3 文件音效 5 个（`XH.audio.play` 统一接口：`page`/`quill`/`paper`/`coin` + `fireplace` 环境循环，懒加载、每音效音量系数 `coeff`）；**行为变更：打卡/记录结算由 8-bit `gold` 改为 mp3 `coin`（跳过 gold）；打开编年史由 8-bit `pageflip` 改为 mp3 `page`（跳过 pageflip）**；静音开关总控并迁入存档 `audioMuted`（`normalize()` 兼容旧档，读旧 `xuehai_muted` 兜底）；localStorage 存档（跨天重置、旧存档自动迁移）；性能优化（进度条 scaleX、动画只用 transform/opacity、图片 opt 瘦身、内页背景预加载）。
 
 **新手教学**（`tutorial.js`）：阿黛向导式分步引导——首次进大厅触发，共 8 步、四张入口卡全部登场：欢迎→地图入口→开辟新大陆→静思庭（启程）→委托板→打卡→编年史（结束）→结业；半透明遮罩 + 高亮光圈 + 气泡，靠真实操作推进（城池创建/委托发布/打卡/反思/打开编年史事件）；存档 `tutorial` 字段断点续学，乾坤袋「重看教学」可重置；教学中常规阿黛事件静默、NPC 气泡隐藏。每步激活时先把目标 `scrollIntoView`(block:center) 滚入视口中央再画高亮，滚动结束/下一帧才量坐标防错位；滚入后仍不在视口（极端小屏/元素不可见）自动跳过并告警。滚动锁经 `tutorial-masked` 类作用域收窄——仅遮罩高亮激活时锁 `.screen` 滚动，`hideOnLeave` 自由导航步（静思庭/委托板/编年史）解除锁定，屏下的反思区/发布委托按钮可滚到；另有步骤级兜底：发布委托遇当日赏金达上限、打卡遇无未完成委托时自动跳过并告警。
 
@@ -153,6 +154,7 @@ localStorage key：`xuehai_save_v1`。顶层结构：
   meditation: { vows: [], reflections: [], lastPromptDate },
   loginStreak: { count, lastDate },
   installGuideDismissed: false,
+  audioMuted: false,
   tutorial: { step, done },
   chronicle: [{ date, nodesLit, questsDone, power, exp, gold, note, questDetails, savedAt }],
   log:       [{ type, source, power, exp, gold, at }]

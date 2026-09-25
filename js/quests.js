@@ -215,7 +215,7 @@
 
     if (XH.audio) {
       XH.audio.play('light');
-      if (!res.reward.capped) setTimeout(function () { XH.audio.play('gold'); }, 230);
+      if (!res.reward.capped) setTimeout(function () { XH.audio.play('coin'); }, 230);
     }
 
     // 卡片点亮动画
@@ -282,7 +282,7 @@
 
     if (XH.audio) {
       XH.audio.play('light');
-      if (!res.reward.capped) setTimeout(function () { XH.audio.play('gold'); }, 230);
+      if (!res.reward.capped) setTimeout(function () { XH.audio.play('coin'); }, 230);
     }
     if (res.leveled) {
       if (XH.audio) XH.audio.play('levelup');
@@ -342,6 +342,7 @@
       $('quest-modal-error').textContent = '';
       setQuestTypeUI('checkin');
       $('quest-modal-overlay').classList.add('open');
+      if (XH.audio) XH.audio.play('paper');
       $('quest-name').focus();
     });
 

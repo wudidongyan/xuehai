@@ -193,6 +193,7 @@
     $('reflect-text').value = '';
     render();
     XH.ui.renderStatusBar();
+    if (XH.audio) XH.audio.play('quill');
     if (XH.ada) XH.ada.trigger('reflection_done');
 
     if (res.first) {

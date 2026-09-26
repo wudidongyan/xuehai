@@ -16,7 +16,8 @@
     for (let i = 0; i < INNER_BG_SRCS.length; i++) {
       const im = new Image();
       im.src = INNER_BG_SRCS[i];
-      if (im.decode) im.decode().catch(function () {});
+      // 不调用 im.decode()：webp 在部分移动浏览器/无痕模式下 decode() 会挂起，
+      // 反而污染解码管线，导致 .page-bg 再进页面时加载失败；预热缓存靠 src 赋值即可。
     }
   }
 

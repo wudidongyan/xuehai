@@ -9,7 +9,7 @@
 
   /* ---------- 预加载：进入大厅时预解码四张内页背景，避免切页现场解码 ---------- */
   let innerBgsPreloaded = false;
-  const INNER_BG_SRCS = ['img/opt/bg-map.png', 'img/opt/bg-board.png', 'img/opt/bg-chronicle.png', 'img/opt/bg-garden.png'];
+  const INNER_BG_SRCS = ['img/opt/bg-map.webp', 'img/opt/bg-board.webp', 'img/opt/bg-chronicle.webp', 'img/opt/bg-garden.webp'];
   function preloadInnerBackgrounds() {
     if (innerBgsPreloaded) return;
     innerBgsPreloaded = true;

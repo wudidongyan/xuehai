@@ -312,6 +312,10 @@
     clearTimeout(pendingTimer);
     if (XH.ada) XH.ada.setSilenced(false);
     document.body.classList.remove('tutorial-open', 'tutorial-masked');
+    // 还原滚动位置：教学的 scrollIntoView 会把 .screen 滚到目标居中，
+    // 导致大厅背景随之整体上移（只露中间一条）；跳过/结束时重置，恢复教学前状态
+    const screens = document.querySelectorAll('.screen');
+    for (let i = 0; i < screens.length; i++) screens[i].scrollTop = 0;
     const ov = $('tutorial-overlay');
     if (ov) ov.classList.remove('open');
   }

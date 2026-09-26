@@ -1437,10 +1437,10 @@ body:has(#screen-meditation.active) .page-bg-shade {
 @media (pointer: coarse) and (orientation: landscape) and (max-height: 430px) {
   .screen { padding: 6px; padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
   .hall-screen { padding: 6px 10px; }
-  .hall-wrap { gap: 6px; }
+  .hall-wrap { gap: 6px; flex: 1; min-height: 0; }
 
   /* 状态栏：单行矮条，字号缩小 */
-  .status-bar { padding: 3px 8px; gap: 8px; flex-wrap: nowrap; }
+  .status-bar { padding: 3px 8px; gap: 8px; flex-wrap: nowrap; flex-shrink: 0; }
   .status-cell { gap: 6px; }
   .status-wealth { gap: 8px; }
   .status-name { font-size: 11px; }
@@ -1454,12 +1454,13 @@ body:has(#screen-meditation.active) .page-bg-shade {
   .mute-btn svg { width: 16px; height: 16px; }
 
   /* 终极远征横幅变矮 */
-  .ultimate-banner { padding: 4px 10px; gap: 8px; }
+  .ultimate-banner { padding: 4px 10px; gap: 8px; flex-shrink: 0; }
   .ultimate-banner-label, .ultimate-banner-name,
   .ultimate-banner-progress, .ultimate-banner-days { font-size: 10px; }
 
-  /* 大厅场景：变矮 + 入口缩小，保持一排 */
-  .hall-scene { height: 120px; }
+  /* 大厅场景：flex 撑满剩余高度，背景锚底露壁炉；入口缩小保持一排 */
+  .hall-scene { flex: 1; min-height: 0; }
+  .scene-bg { object-position: center bottom; }
   .scene-fire-glow { display: none; }
   .station-icon { width: 42px; height: 42px; }
   .station-icon .station-img { width: 28px; height: 28px; }
@@ -1468,7 +1469,7 @@ body:has(#screen-meditation.active) .page-bg-shade {
   .station-map, .station-board, .station-settle, .station-meditate { bottom: 5%; }
 
   /* 阿黛对话条压缩 */
-  .npc-dialog { gap: 10px; padding: 6px 10px; }
+  .npc-dialog { gap: 10px; padding: 6px 10px; flex-shrink: 0; }
   .npc-avatar { width: 56px; height: 56px; border-width: 2px; box-shadow: 3px 3px 0 #000; }
   .npc-bubble { min-height: 44px; padding: 6px 10px; }
   .npc-name { font-size: 9px; margin-bottom: 3px; }

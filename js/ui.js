@@ -7,9 +7,9 @@
 
   const $ = function (id) { return document.getElementById(id); };
 
-  /* ---------- 预加载：进入大厅时预解码四张内页背景，避免切页现场解码 ---------- */
+  /* ---------- 预加载：进入大厅时预解码背景图（大厅 + 四张内页），避免切页现场解码 ---------- */
   let innerBgsPreloaded = false;
-  const INNER_BG_SRCS = ['img/opt/bg-map.webp', 'img/opt/bg-board.webp', 'img/opt/bg-chronicle.webp', 'img/opt/bg-garden.webp'];
+  const INNER_BG_SRCS = ['img/opt/hall-bg.webp', 'img/opt/bg-map.webp', 'img/opt/bg-board.webp', 'img/opt/bg-chronicle.webp', 'img/opt/bg-garden.webp'];
   function preloadInnerBackgrounds() {
     if (innerBgsPreloaded) return;
     innerBgsPreloaded = true;

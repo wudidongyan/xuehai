@@ -51,6 +51,63 @@
   let pendingTimer = null;
   let offAdvance = null;
 
+  /* ============ 临时调试浮层（定位背景位移，验收后删除） ============ */
+  const Dbg = (function () {
+    let el = null;
+    const log = [];
+    function rStr(r) {
+      if (!r) return 'null';
+      return 't=' + Math.round(r.top) + ' b=' + Math.round(r.bottom) +
+        ' h=' + Math.round(r.height) + ' l=' + Math.round(r.left);
+    }
+    function collect() {
+      const bg = document.querySelector('.scene-bg');
+      const scene = document.querySelector('.hall-scene');
+      const screen = document.querySelector('.screen.active');
+      return {
+        bg: bg ? { rect: rStr(bg.getBoundingClientRect()), offTop: bg.offsetTop,
+                   pos: getComputedStyle(bg).objectPosition, tf: getComputedStyle(bg).transform } : null,
+        scene: scene ? { st: scene.scrollTop, sh: scene.scrollHeight, ch: scene.clientHeight,
+                         rect: rStr(scene.getBoundingClientRect()) } : null,
+        screen: screen ? { st: screen.scrollTop, sh: screen.scrollHeight, ch: screen.clientHeight,
+                           oy: getComputedStyle(screen).overflowY, rect: rStr(screen.getBoundingClientRect()) } : null,
+        doc: { de: document.documentElement.scrollTop, body: document.body.scrollTop, ih: window.innerHeight }
+      };
+    }
+    function ensureEl() {
+      if (el || !document.body) return el;
+      el = document.createElement('div');
+      el.style.cssText = 'position:fixed;left:6px;top:6px;z-index:999999;font:10px/1.45 monospace;' +
+        'background:rgba(0,0,0,0.8);color:#3f3;padding:8px 10px;white-space:pre;' +
+        'max-width:96vw;overflow:hidden;pointer-events:none;';
+      document.body.appendChild(el);
+      return el;
+    }
+    function render() {
+      ensureEl();
+      if (!el) return;
+      let html = '';
+      for (let i = 0; i < log.length; i++) {
+        const s = log[i];
+        html += '[' + s.label + ']\n';
+        if (s.bg) html += ' bg.rect=' + s.bg.rect + '\n  offTop=' + s.bg.offTop + ' pos=' + s.bg.pos + ' tf=' + s.bg.tf + '\n';
+        if (s.scene) html += ' scene.st=' + s.scene.st + ' sh=' + s.scene.sh + ' ch=' + s.scene.ch + '\n  scene.rect=' + s.scene.rect + '\n';
+        if (s.screen) html += ' screen.st=' + s.screen.st + ' sh=' + s.screen.sh + ' ch=' + s.screen.ch + ' oy=' + s.screen.oy + '\n  screen.rect=' + s.screen.rect + '\n';
+        html += ' doc.de=' + s.doc.de + ' body=' + s.doc.body + ' ih=' + s.doc.ih;
+        if (i < log.length - 1) html += '\n---';
+        html += '\n';
+      }
+      el.textContent = html;
+    }
+    function snap(label) {
+      log.push(Object.assign({ label: label }, collect()));
+      if (log.length > 6) log.shift();
+      render();
+    }
+    return { snap: snap };
+  })();
+  /* ================================================================ */
+
   /* ---------- 订阅当前步的推进事件 ---------- */
   function subscribe() {
     unsubscribe();
@@ -157,11 +214,13 @@
     const fullyVisible = r0.top >= 0 && r0.bottom <= window.innerHeight &&
       r0.left >= 0 && r0.right <= window.innerWidth;
     if (!fullyVisible) {
+      Dbg.snap('定位:前 ' + step.target);
       try {
         el.scrollIntoView({ block: 'center', behavior: 'instant' });
       } catch (e) {
         el.scrollIntoView(true);
       }
+      Dbg.snap('定位:后 ' + step.target);
     }
 
     // 滚动结束 / 下一帧再量坐标，防止高亮与气泡错位
@@ -304,6 +363,7 @@
   }
 
   function end() {
+    Dbg.snap('跳过:收尾前');
     if (XH.state) {
       XH.state.tutorial = { step: 0, done: true };
       XH.storage.save(XH.state);
@@ -325,10 +385,12 @@
     if (document.body) document.body.scrollTop = 0;
     const ov = $('tutorial-overlay');
     if (ov) ov.classList.remove('open');
+    Dbg.snap('跳过:收尾后');
   }
 
   function start(stepIndex) {
     active = true;
+    Dbg.snap('教学:进入 step=' + stepIndex);
     if (XH.ada) XH.ada.setSilenced(true);
     document.body.classList.add('tutorial-open');
     $('tutorial-overlay').classList.add('open');

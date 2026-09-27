@@ -86,7 +86,7 @@
     function render() {
       ensureEl();
       if (!el) return;
-      let html = '';
+      let html = 'BUILD=bgdiv\n';
       for (let i = 0; i < log.length; i++) {
         const s = log[i];
         html += '[' + s.label + ']\n';

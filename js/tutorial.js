@@ -439,5 +439,5 @@
 
   function isActive() { return active; }
 
-  XH.tutorial = { onHallEnter: onHallEnter, onScreen: onScreen, reset: reset, isActive: isActive };
+  XH.tutorial = { onHallEnter: onHallEnter, onScreen: onScreen, reset: reset, isActive: isActive, _dbgSnap: Dbg.snap };
 })();

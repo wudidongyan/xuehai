@@ -194,7 +194,7 @@ localStorage key：`xuehai_save_v1`。顶层结构：
 
 关键 CSS：
 - 入口图标 `.station-img`：`object-fit: contain; image-rendering: pixelated`（桌面 54px / 移动 44px）。
-- 背景 `.scene-bg`：`object-fit: cover; object-position: center 30%`。
+- 背景 `.scene-bg`：`background-image + background-size: cover; background-position: center 30%`（横屏锚底 `center bottom`；用 background 而非 `<img>`+`object-fit`，规避移动端二次显示/缩放后的裁剪重绘错位）。
 - 内页背景 `.page-bg`：`object-fit: cover; image-rendering: pixelated`，锚点按各图主体定位（map `center center` / board `center 30%` / chronicle `center 40%` / garden `left 25%`）；`.page-bg-shade` 底部渐变遮罩（透明 → `--bg`，同大厅）；仅当对应 `.screen.active` 时经 `body:has(...)` 显示。
 - 阿黛头像框 `.npc-avatar`：120×120px 正方形（3px 黑边 + 4px 硬阴影，垂直居中；窄屏 <768px 缩回 80px）；`.npc-avatar-img`：`object-fit: cover; image-rendering: pixelated`。
 

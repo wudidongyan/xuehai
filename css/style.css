@@ -481,8 +481,10 @@ svg { image-rendering: pixelated; }
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center 30%;
+  background-image: url('../img/opt/hall-bg.webp');
+  background-size: cover;
+  background-position: center 30%;
+  background-repeat: no-repeat;
 }
 
 /* 底部渐变遮罩（保证下方 UI 文字可读） */
@@ -1460,7 +1462,7 @@ body:has(#screen-meditation.active) .page-bg-shade {
 
   /* 大厅场景：flex 撑满剩余高度，背景锚底露壁炉；入口缩小保持一排 */
   .hall-scene { flex: 1; min-height: 0; }
-  .scene-bg { object-position: center bottom; }
+  .scene-bg { background-position: center bottom; }
   .scene-fire-glow { display: none; }
   .station-icon { width: 42px; height: 42px; }
   .station-icon .station-img { width: 28px; height: 28px; }

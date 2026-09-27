@@ -66,7 +66,7 @@
       const screen = document.querySelector('.screen.active');
       return {
         bg: bg ? { rect: rStr(bg.getBoundingClientRect()), offTop: bg.offsetTop,
-                   pos: getComputedStyle(bg).objectPosition, tf: getComputedStyle(bg).transform } : null,
+                   pos: getComputedStyle(bg).backgroundPosition, tf: getComputedStyle(bg).transform } : null,
         scene: scene ? { st: scene.scrollTop, sh: scene.scrollHeight, ch: scene.clientHeight,
                          rect: rStr(scene.getBoundingClientRect()) } : null,
         screen: screen ? { st: screen.scrollTop, sh: screen.scrollHeight, ch: screen.clientHeight,

@@ -68,16 +68,6 @@
       if (XH.tutorial) XH.tutorial.onScreen(id);
     }, function () {
       screenSwitching = false;
-      // 修复：object-fit:cover 背景在 display:none→flex 后可能绘制错位（只露一条），
-      // 微动 object-position 触发一次重绘再还原，不改任何最终样式值。
-      const bg = target.querySelector('.scene-bg');
-      if (bg) {
-        const cur = bg.style.objectPosition;
-        bg.style.objectPosition = '50% 50%';
-        requestAnimationFrame(function () {
-          requestAnimationFrame(function () { bg.style.objectPosition = cur; });
-        });
-      }
       // 临时调试：抓「返回大厅」瞬间的大厅背景状态（定位背景位移，验收后删除）
       if (id === 'screen-hall' && XH.tutorial && XH.tutorial._dbgSnap) {
         setTimeout(function () {

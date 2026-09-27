@@ -68,13 +68,6 @@
       if (XH.tutorial) XH.tutorial.onScreen(id);
     }, function () {
       screenSwitching = false;
-      // 临时调试：抓「返回大厅」瞬间的大厅背景状态（定位背景位移，验收后删除）
-      if (id === 'screen-hall' && XH.tutorial && XH.tutorial._dbgSnap) {
-        setTimeout(function () {
-          XH.tutorial._dbgSnap('回大厅:显示后(即时)');
-          setTimeout(function () { XH.tutorial._dbgSnap('回大厅:显示后(+500ms)'); }, 500);
-        }, 50);
-      }
     });
   }
 

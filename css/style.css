@@ -485,6 +485,7 @@ svg { image-rendering: pixelated; }
   background-size: cover;
   background-position: center 30%;
   background-repeat: no-repeat;
+  image-rendering: auto; /* 覆盖 body 继承的 pixelated，规避部分手机 GPU 最近邻下采样渲染异常 */
 }
 
 /* 底部渐变遮罩（保证下方 UI 文字可读） */

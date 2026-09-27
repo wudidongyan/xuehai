@@ -152,11 +152,16 @@
       return;
     }
 
-    // 先滚入视口中央再定位（程序性滚动，不受 body.tutorial-open 的用户滚动锁限制）
-    try {
-      el.scrollIntoView({ block: 'center', behavior: 'instant' });
-    } catch (e) {
-      el.scrollIntoView(true);
+    // 目标已在视口内则不滚动（避免无谓滚动导致大厅背景位移）；否则滚入视口中央
+    const r0 = el.getBoundingClientRect();
+    const fullyVisible = r0.top >= 0 && r0.bottom <= window.innerHeight &&
+      r0.left >= 0 && r0.right <= window.innerWidth;
+    if (!fullyVisible) {
+      try {
+        el.scrollIntoView({ block: 'center', behavior: 'instant' });
+      } catch (e) {
+        el.scrollIntoView(true);
+      }
     }
 
     // 滚动结束 / 下一帧再量坐标，防止高亮与气泡错位
